@@ -1,5 +1,6 @@
 import { ResumeForm } from '@/builder/components/ResumeForm';
 import { LivePreview } from '@/builder/components/LivePreview';
+import { AICoachPanel } from '@/builder/components/AICoachPanel';
 import { downloadPDF } from '@/utils/pdf';
 import { printResume } from '@/utils/print';
 
@@ -15,6 +16,9 @@ export function Builder() {
 
       <div className="w-full lg:sticky lg:top-0 lg:max-h-[calc(100vh-120px)] lg:w-[50%] lg:overflow-y-auto">
         <div className="space-y-4 p-4">
+          <div className="no-print mb-2" data-no-print>
+            <AICoachPanel />
+          </div>
           <div className="flex gap-2 no-print" data-no-print>
             <button
               type="button"
