@@ -465,7 +465,7 @@ const RESUME_VARIANTS: [string, () => Resume | Resume[]][] = [
 
 describe('Mass Resume Template Tests', () => {
   // Core matrix: every variant x every template = no crash
-  describe.each(TEMPLATES)('Template: %s', (templateName, Template) => {
+  describe.each(TEMPLATES)('Template: %s', (_templateName, Template) => {
     it.each(RESUME_VARIANTS)('renders %s without crashing', (_label, generator) => {
       const data = generator();
       const resumes = Array.isArray(data) ? data : [data];
@@ -477,7 +477,7 @@ describe('Mass Resume Template Tests', () => {
   });
 
   // Single-section variants separately (array of resumes)
-  describe.each(TEMPLATES)('Template: %s - single section resumes', (templateName, Template) => {
+  describe.each(TEMPLATES)('Template: %s - single section resumes', (_templateName, Template) => {
     const singles = makeSingleSectionResumes();
     it.each([
       ['only education', singles[0]],

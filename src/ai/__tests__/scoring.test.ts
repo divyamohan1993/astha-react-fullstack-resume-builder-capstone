@@ -268,6 +268,7 @@ describe('computeScore', () => {
   const baseL2: L2Result = {
     semanticScore: 0.75,
     semanticMatches: ['react typescript', 'node express', 'web development'],
+    method: 'tfidf-fallback',
   };
 
   it('produces a score between 0 and 100', () => {
@@ -360,7 +361,7 @@ describe('computeScore', () => {
       educationScore: 1.0,
       completenessScore: 1.0,
     };
-    const l2: L2Result = { semanticScore: 1.0, semanticMatches: [] };
+    const l2: L2Result = { semanticScore: 1.0, semanticMatches: [], method: 'tfidf-fallback' };
     const result = computeScore(l1, l2, null, null);
     expect(result.overall).toBeLessThanOrEqual(100);
   });

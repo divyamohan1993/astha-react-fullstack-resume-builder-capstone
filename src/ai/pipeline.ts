@@ -6,7 +6,7 @@
  * Handles batch processing of multiple resumes.
  *
  * Pipeline order (spec section 6.3):
- *   ParseAgent -> L1_NLPAgent -> L2_EmbedAgent -> L3_ReasonAgent -> ScoreAgent -> DistanceAgent
+ *   L1_NLPAgent -> L2_EmbedAgent -> L3_ReasonAgent -> L4_FallbackAgent -> ScoreAgent -> DistanceAgent
  *
  * Progressive: L1 scores appear instantly. L2 enriches within 2s.
  * L3 adds reasoning flags over 5-15s. Dashboard updates progressively.
@@ -14,8 +14,9 @@
 
 import type { CandidateScores, AnalysisLayer, RedFlag } from '../store/types';
 import { analyzeL1 } from './agents/L1_NLPAgent';
-import { analyzeL2 } from './agents/L2_EmbedAgent';
+import { analyzeL2, analyzeL2Sync } from './agents/L2_EmbedAgent';
 import {
+  analyzeL3,
   buildContradictionPrompt,
   buildRefinementPrompt,
   parseContradictionResponse,
@@ -24,15 +25,12 @@ import {
 import { analyzeWithGemini } from './agents/L4_FallbackAgent';
 import { computeScore } from './agents/ScoreAgent';
 import { getDistance } from './agents/DistanceAgent';
+import { detectCapabilities } from './models/capabilities';
 
 export interface PipelineConfig {
-  /** Gemini API key for L4 fallback (optional) */
   geminiApiKey?: string;
-  /** Google Maps API key for distance calculation (optional) */
   mapsApiKey?: string;
-  /** Job location for distance calculation */
   jobLocation?: string;
-  /** Max concurrent analyses for batch processing */
   concurrency?: number;
 }
 
@@ -51,53 +49,61 @@ export type ProgressCallback = (progress: PipelineProgress) => void;
  *
  * Pipeline stages:
  * 1. L1 (NLP): instant keyword + section + entity extraction
- * 2. L2 (Embed): TF-IDF cosine similarity (MiniLM proxy)
- * 3. L3 (Reason): Gemma 3 WebLLM contradiction detection (stub)
- * 4. Score: weighted composite per spec section 6.13
- * 5. Distance: Google Maps (optional, async)
+ * 2. L2 (Embed): ONNX MiniLM-L6-v2 embeddings, TF-IDF fallback
+ * 3. L3 (Reason): Gemma 3 1B via WebLLM (WebGPU/WASM)
+ * 4. L4 (Fallback): Gemini 2.5 Pro API -- only if L3 fails entirely
+ * 5. Score: weighted composite per spec section 6.13
+ * 6. Distance: Google Maps (optional, async)
  */
 export async function analyzeResume(
   candidateId: string,
   resumeText: string,
   jdText: string,
   config: PipelineConfig = {},
-  onProgress?: ProgressCallback
+  onProgress?: ProgressCallback,
 ): Promise<{ scores: CandidateScores; redFlags: RedFlag[] }> {
   let redFlags: RedFlag[] = [];
 
   // --- Layer 1: NLP (instant) ---
   const l1 = analyzeL1(resumeText, jdText);
-  onProgress?.({
-    candidateId,
-    layer: 'L1',
-    scores: null,
-    redFlags: [],
-  });
+  onProgress?.({ candidateId, layer: 'L1', scores: null, redFlags: [] });
 
-  // --- Layer 2: Embedding proxy (TF-IDF cosine) ---
-  const l2 = analyzeL2(resumeText, jdText);
-  onProgress?.({
-    candidateId,
-    layer: 'L2',
-    scores: null,
-    redFlags: [],
-  });
-
-  // --- Layer 3: Reasoning (stub -- WebLLM Gemma 3 not yet wired) ---
-  let l3: L3Result | null = null;
+  // --- Layer 2: Embedding (ONNX MiniLM -> TF-IDF fallback) ---
+  let l2;
   try {
-    // L3 WebLLM will be wired here when model files are available.
-    // For now, attempt L4 fallback if API key is configured.
-    if (config.geminiApiKey) {
+    l2 = await analyzeL2(resumeText, jdText);
+  } catch {
+    // ONNX completely failed, use sync TF-IDF
+    l2 = analyzeL2Sync(resumeText, jdText);
+  }
+  onProgress?.({ candidateId, layer: 'L2', scores: null, redFlags: [] });
+
+  // --- Layer 3: Reasoning (Gemma 3 via WebLLM) ---
+  let l3: L3Result | null = null;
+  const capabilities = await detectCapabilities();
+
+  if (capabilities.canRunL3) {
+    try {
+      // Try Gemma 3 locally via WebLLM
+      l3 = await analyzeL3(resumeText, jdText);
+      redFlags = l3.redFlags;
+    } catch {
+      // WebLLM failed -- try L4 Gemini API fallback
+      l3 = null;
+    }
+  }
+
+  // --- Layer 4: Gemini API fallback -- only if L3 failed entirely ---
+  if (!l3 && config.geminiApiKey) {
+    try {
       const prompt = buildContradictionPrompt(resumeText, jdText);
       const response = await analyzeWithGemini(config.geminiApiKey, prompt);
       redFlags = parseContradictionResponse(response);
 
-      // Get refinement analysis for experience/project scoring
       const refinePrompt = buildRefinementPrompt(resumeText);
       const refineResponse = await analyzeWithGemini(
         config.geminiApiKey,
-        refinePrompt
+        refinePrompt,
       );
       try {
         let cleaned = refineResponse.trim();
@@ -114,31 +120,30 @@ export async function analyzeResume(
           };
         }
       } catch {
-        l3 = { redFlags, experienceLevel: 'medium', projectScores: [], reasoning: '' };
+        l3 = {
+          redFlags,
+          experienceLevel: 'medium',
+          projectScores: [],
+          reasoning: '',
+        };
       }
+    } catch {
+      // L4 also failed -- continue with L1+L2 only
+      l3 = null;
     }
-  } catch {
-    // L3/L4 failure: continue with L1+L2 scores only
-    l3 = null;
   }
 
-  onProgress?.({
-    candidateId,
-    layer: 'L3',
-    scores: null,
-    redFlags,
-  });
+  onProgress?.({ candidateId, layer: 'L3', scores: null, redFlags });
 
-  // --- Distance (optional, async) ---
+  // --- Distance (optional, async, online-only) ---
   let distance: { km: number } | null = null;
   if (config.mapsApiKey && config.jobLocation && l1.name) {
-    // Extract candidate location from resume (heuristic: near contact info)
     const candidateLocation = extractLocation(resumeText);
     if (candidateLocation) {
       const distResult = await getDistance(
         config.mapsApiKey,
         candidateLocation,
-        config.jobLocation
+        config.jobLocation,
       );
       if (distResult) {
         distance = { km: distResult.km };
@@ -149,26 +154,19 @@ export async function analyzeResume(
   // --- Score computation (spec section 6.13) ---
   const scores = computeScore(l1, l2, l3, distance);
 
-  onProgress?.({
-    candidateId,
-    layer: 'done',
-    scores,
-    redFlags,
-  });
+  onProgress?.({ candidateId, layer: 'done', scores, redFlags });
 
   return { scores, redFlags };
 }
 
 /**
  * Extract a location string from resume text (near the top, likely contact area).
- * Heuristic: look for city/state patterns or address-like text in first few lines.
  */
 function extractLocation(text: string): string {
   const lines = text.split('\n').slice(0, 10);
   for (const line of lines) {
-    // Match city, state patterns or Indian city names
     const locationMatch = line.match(
-      /\b(?:[A-Z][a-z]+(?:\s[A-Z][a-z]+)*,\s*[A-Z]{2}\b|[A-Z][a-z]+(?:\s[A-Z][a-z]+)*,\s*[A-Za-z\s]+(?:India|USA|UK|Canada))/
+      /\b(?:[A-Z][a-z]+(?:\s[A-Z][a-z]+)*,\s*[A-Z]{2}\b|[A-Z][a-z]+(?:\s[A-Z][a-z]+)*,\s*[A-Za-z\s]+(?:India|USA|UK|Canada))/,
     );
     if (locationMatch) return locationMatch[0];
   }
@@ -177,23 +175,22 @@ function extractLocation(text: string): string {
 
 /**
  * Batch analyze multiple resumes with concurrency control.
- *
- * Processes up to `concurrency` resumes in parallel (default: 4, per spec section 5.3).
- * Calls onProgress for each resume as each layer completes.
+ * Processes up to `concurrency` resumes in parallel (default: 4).
  */
 export async function analyzeBatch(
   candidates: Array<{ id: string; resumeText: string }>,
   jdText: string,
   config: PipelineConfig = {},
-  onProgress?: ProgressCallback
-): Promise<Map<string, { scores: CandidateScores; redFlags: RedFlag[] }>> {
+  onProgress?: ProgressCallback,
+): Promise<
+  Map<string, { scores: CandidateScores; redFlags: RedFlag[] }>
+> {
   const concurrency = config.concurrency ?? 4;
   const results = new Map<
     string,
     { scores: CandidateScores; redFlags: RedFlag[] }
   >();
 
-  // Process in batches of `concurrency`
   for (let i = 0; i < candidates.length; i += concurrency) {
     const batch = candidates.slice(i, i + concurrency);
     const batchResults = await Promise.allSettled(
@@ -209,8 +206,8 @@ export async function analyzeBatch(
               error: String(error),
             });
             return null;
-          })
-      )
+          }),
+      ),
     );
 
     for (const settled of batchResults) {
