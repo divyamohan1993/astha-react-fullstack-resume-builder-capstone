@@ -1,23 +1,38 @@
 /**
- * WebLLM Gemma 3 Integration
+ * Gemma 4 E2B Integration via @huggingface/transformers
  *
- * Loads Gemma-3-1B-it (quantized Q4) via @mlc-ai/web-llm.
- * Progressive: tries WebGPU first, falls back to WASM CPU.
- * Model is cached in IndexedDB after first download (~600MB).
+ * Loads google/gemma-4-E2B-it (effective 2B params, Q4F16 quantized) directly
+ * in the browser via Transformers.js + WebGPU. Falls back to WASM for CPU.
  *
- * Usage:
- *   const engine = await getOrCreateEngine(onProgress);
- *   const response = await generate(engine, prompt);
+ * Model: onnx-community/gemma-4-E2B-it-ONNX
+ * Size: ~1.5GB Q4 quantized, cached in browser after first download
+ * Context: 128K tokens
+ * License: Apache 2.0
+ *
+ * Source: https://huggingface.co/onnx-community/gemma-4-E2B-it-ONNX
+ * Blog: https://huggingface.co/blog/gemma4
+ * Google: https://blog.google/innovation-and-ai/technology/developers-tools/gemma-4/
+ *
+ * Why Gemma 4 E2B over Gemma 3 1B:
+ * - Newer (April 2026), more capable reasoning at same parameter class
+ * - Official ONNX export by onnx-community (no MLC compilation needed)
+ * - Native Transformers.js support with WebGPU + WASM backends
+ * - Per-Layer Embeddings (PLE) for better parameter efficiency on device
+ * - 128K context (vs 8K for Gemma 3 1B)
  */
 
-import type { MLCEngine, InitProgressReport } from '@mlc-ai/web-llm';
+// Types for the pipeline -- Transformers.js is dynamically imported
+interface TextGenerationOutput {
+  generated_text: string;
+}
 
-// Gemma 3 1B instruction-tuned, 4-bit quantized
-// Smallest model that can do structured reasoning
-const MODEL_ID = 'gemma-3-1b-it-q4f16_1-MLC';
+type TextGenerationPipeline = (
+  prompt: string,
+  options?: Record<string, unknown>,
+) => Promise<TextGenerationOutput[]>;
 
-let engineInstance: MLCEngine | null = null;
-let loadingPromise: Promise<MLCEngine> | null = null;
+let pipelineInstance: TextGenerationPipeline | null = null;
+let loadingPromise: Promise<TextGenerationPipeline> | null = null;
 
 export type ProgressCallback = (report: {
   progress: number;
@@ -25,75 +40,114 @@ export type ProgressCallback = (report: {
 }) => void;
 
 /**
- * Get or create the WebLLM engine. Reuses singleton.
- * Model downloads ~600MB on first use, cached in IndexedDB thereafter.
+ * Detect whether WebGPU is available for fast inference.
+ */
+async function hasWebGPU(): Promise<boolean> {
+  try {
+    if (!('gpu' in navigator)) return false;
+    const gpu = (navigator as { gpu?: { requestAdapter(): Promise<unknown | null> } }).gpu;
+    if (!gpu) return false;
+    const adapter = await gpu.requestAdapter();
+    return adapter !== null;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Get or create the Gemma 4 E2B text generation pipeline.
+ * Model is downloaded on first use (~1.5GB Q4), cached in browser storage.
+ *
+ * Progressive: WebGPU (fast) -> WASM (slower, works everywhere).
  */
 export async function getOrCreateEngine(
   onProgress?: ProgressCallback,
-): Promise<MLCEngine> {
-  if (engineInstance) return engineInstance;
-
+): Promise<TextGenerationPipeline> {
+  if (pipelineInstance) return pipelineInstance;
   if (loadingPromise) return loadingPromise;
 
   loadingPromise = (async () => {
-    // Dynamic import to keep it out of the main bundle
-    const { CreateMLCEngine } = await import('@mlc-ai/web-llm');
+    onProgress?.({ progress: 0, text: 'Loading Gemma 4 E2B...' });
 
-    const engine = await CreateMLCEngine(MODEL_ID, {
-      initProgressCallback: (report: InitProgressReport) => {
-        onProgress?.({
-          progress: report.progress,
-          text: report.text,
-        });
-      },
+    // Dynamic import to keep Transformers.js out of main bundle
+    const { pipeline, env } = await import('@huggingface/transformers');
+
+    // Allow remote models from HuggingFace Hub
+    env.allowRemoteModels = true;
+    env.allowLocalModels = false;
+
+    const webgpu = await hasWebGPU();
+    const device = webgpu ? 'webgpu' : 'wasm';
+    const dtype = webgpu ? 'q4f16' : 'q4';
+
+    onProgress?.({
+      progress: 0.1,
+      text: `Using ${device.toUpperCase()} backend. Downloading model...`,
     });
 
-    engineInstance = engine;
+    const pipe = (await pipeline('text-generation', 'onnx-community/gemma-4-E2B-it-ONNX', {
+      device,
+      dtype,
+      progress_callback: (event: { progress?: number; status?: string }) => {
+        if (event.progress !== undefined) {
+          onProgress?.({
+            progress: 0.1 + event.progress * 0.9,
+            text: event.status ?? `Downloading: ${Math.round(event.progress * 100)}%`,
+          });
+        }
+      },
+    })) as unknown as TextGenerationPipeline;
+
+    pipelineInstance = pipe;
     loadingPromise = null;
-    return engine;
+
+    onProgress?.({ progress: 1, text: 'Gemma 4 E2B ready.' });
+    return pipe;
   })();
 
   return loadingPromise;
 }
 
 /**
- * Generate a response from Gemma 3.
- * Returns the full text response.
+ * Generate a response from Gemma 4 E2B.
+ * Returns the generated text (system + user prompt -> model response).
  */
 export async function generate(
-  engine: MLCEngine,
+  pipe: TextGenerationPipeline,
   prompt: string,
   maxTokens = 2048,
 ): Promise<string> {
-  const response = await engine.chat.completions.create({
-    messages: [
-      {
-        role: 'system',
-        content:
-          'You are an expert ATS resume analyst. Respond only in valid JSON. Be precise and concise.',
-      },
-      { role: 'user', content: prompt },
-    ],
-    max_tokens: maxTokens,
-    temperature: 0.1, // Low temp for structured output
+  const fullPrompt = `<start_of_turn>user
+You are an expert ATS resume analyst. Respond only in valid JSON. Be precise and concise.
+
+${prompt}<end_of_turn>
+<start_of_turn>model
+`;
+
+  const outputs = await pipe(fullPrompt, {
+    max_new_tokens: maxTokens,
+    temperature: 0.1,
+    do_sample: true,
+    return_full_text: false,
   });
 
-  return response.choices[0]?.message?.content ?? '';
+  return outputs[0]?.generated_text ?? '';
 }
 
 /**
- * Check if the engine is loaded and ready.
+ * Check if the pipeline is loaded and ready.
  */
 export function isEngineReady(): boolean {
-  return engineInstance !== null;
+  return pipelineInstance !== null;
 }
 
 /**
- * Unload the engine to free memory.
+ * Unload the pipeline to free memory.
  */
 export async function unloadEngine(): Promise<void> {
-  if (engineInstance) {
-    await engineInstance.unload();
-    engineInstance = null;
+  if (pipelineInstance) {
+    // Transformers.js pipelines don't have an explicit unload
+    // but we can null the reference to allow GC
+    pipelineInstance = null;
   }
 }

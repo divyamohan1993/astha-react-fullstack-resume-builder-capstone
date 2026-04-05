@@ -101,8 +101,9 @@ export async function detectCapabilities(): Promise<DeviceCapabilities> {
   // L2 (ONNX MiniLM): needs WASM
   const canRunL2 = hasWASM;
 
-  // L3 (Gemma 3 1B Q4 ~600MB): needs WebGPU or WASM + at least 2GB RAM
-  // WebGPU = full speed. WASM CPU = 30-60s per analysis (spec section 7.4)
+  // L3 (Gemma 4 E2B Q4 ~1.5GB): needs WebGPU or WASM + at least 2GB RAM
+  // WebGPU = fast inference. WASM Q4 = slower but works everywhere.
+  // Source: https://huggingface.co/onnx-community/gemma-4-E2B-it-ONNX
   const canRunL3 = (hasWebGPU || hasWASM) && ramGB >= 2;
 
   return {
