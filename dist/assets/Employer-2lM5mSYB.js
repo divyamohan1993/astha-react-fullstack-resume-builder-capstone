@@ -1,1 +1,0 @@
-import{j as e}from"./index-DApDeDzx.js";import"./vendor--8wsACsX.js";function s(){return e.jsxs("div",{className:"p-8",children:[e.jsx("h1",{className:"text-2xl font-bold",children:"Employer Dashboard"}),e.jsx("p",{style:{color:"var(--text-secondary)"},children:"Loading employer mode..."})]})}export{s as Employer};

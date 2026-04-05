@@ -1,1 +1,0 @@
-import{j as t}from"./index-DApDeDzx.js";import"./vendor--8wsACsX.js";function i(){return t.jsx("div",{className:"p-8",children:t.jsx("h1",{className:"text-2xl font-bold",children:"Candidate Detail"})})}export{i as CandidateDetail};
