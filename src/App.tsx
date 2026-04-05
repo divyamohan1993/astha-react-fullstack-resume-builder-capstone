@@ -45,8 +45,8 @@ export function App() {
             <Route path="builder/preview" element={<PrintPreview />} />
             <Route path="employer" element={<Employer />} />
             <Route path="employer/:id" element={<CandidateDetail />} />
-            <Route path="pitch" element={<PitchDeck />} />
           </Route>
+          <Route path="pitch" element={<PitchDeck />} />
         </Routes>
       </Suspense>
     </BrowserRouter>
