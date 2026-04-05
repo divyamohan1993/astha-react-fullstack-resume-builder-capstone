@@ -89,7 +89,7 @@ export function ScoreBreakdown({ scores }: ScoreBreakdownProps) {
     ...p,
     weighted: Math.round(p.raw * p.weight * 100),
   }));
-  const total = weighted.reduce((sum, p) => sum + p.weighted, 0);
+  void weighted.reduce((sum, p) => sum + p.weighted, 0);
 
   return (
     <section

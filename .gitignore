@@ -1,7 +1,11 @@
 node_modules/
+dist/
+dev-dist/
 
 # yarn v3 artifacts
 .yarn/
 .pnp.*
 
 .superpowers/
+.env
+.env.local
