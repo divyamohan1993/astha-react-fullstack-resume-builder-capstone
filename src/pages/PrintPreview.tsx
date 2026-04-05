@@ -1,0 +1,7 @@
+export function PrintPreview() {
+  return (
+    <div className="p-8">
+      <h1 className="text-2xl font-bold">Print Preview</h1>
+    </div>
+  );
+}
