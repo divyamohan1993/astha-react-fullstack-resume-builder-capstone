@@ -260,5 +260,6 @@ export const useBridgeStore = create<BridgeState>((set, _get) => ({
 
   reset: () => {
     set({ ...initialState });
+    storage.save(initialState);
   },
 }));
