@@ -73,7 +73,7 @@ function updateSession(state: BridgeState, patch: Partial<TestSession>): Partial
   return { testSession: { ...state.testSession, ...patch } };
 }
 
-export const useBridgeStore = create<BridgeState>((set, get) => ({
+export const useBridgeStore = create<BridgeState>((set, _get) => ({
   ...initialState,
 
   setCriteria: (criteria) =>

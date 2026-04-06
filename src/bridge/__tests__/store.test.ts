@@ -24,7 +24,6 @@ import type {
   AudioFlag,
   SignedScorecard,
   MatchSignal,
-  DifficultyLevel,
 } from '../types';
 
 function getState() {
