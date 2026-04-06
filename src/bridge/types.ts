@@ -78,7 +78,7 @@ export interface EmployerReply { replyId: string; matchId: string; employerId: s
 // --- Constants ---
 export const DEFAULT_WEIGHTS: Record<string, number> = {
   skillsMatch: 30, experience: 20, education: 15, projects: 10,
-  certifications: 5, distance: 5, extracurricular: 5, gpa: 3, completeness: 2,
+  certifications: 5, distance: 5, extracurricular: 5, gpa: 5, completeness: 5,
 };
 
 export const LEVEL_MULTIPLIERS: Record<DifficultyLevel, number> = { 1: 1.0, 2: 1.5, 3: 2.5, 4: 4.0, 5: 6.0 };
