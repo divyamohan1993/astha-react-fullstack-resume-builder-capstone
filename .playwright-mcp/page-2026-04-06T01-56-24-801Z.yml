@@ -1,0 +1,66 @@
+- generic [ref=e3]:
+  - navigation "Main navigation" [ref=e4]:
+    - link "Skip to content" [ref=e5] [cursor=pointer]:
+      - /url: "#main-content"
+    - link "ResumeAI home" [ref=e6] [cursor=pointer]:
+      - /url: /
+      - img "Shoolini University logo" [ref=e7]
+      - generic [ref=e8]:
+        - generic [ref=e9]: ResumeAI
+        - generic [ref=e10]: Shoolini University · BTech CSE Capstone
+    - generic [ref=e11]:
+      - link "Home" [ref=e12] [cursor=pointer]:
+        - /url: /
+      - link "Builder" [ref=e13] [cursor=pointer]:
+        - /url: /builder
+      - link "Employer" [ref=e14] [cursor=pointer]:
+        - /url: /employer
+      - link "Publish Criteria" [ref=e15] [cursor=pointer]:
+        - /url: /employer/publish
+      - link "Match Signals" [ref=e16] [cursor=pointer]:
+        - /url: /employer/matches
+      - link "My Applications" [ref=e17] [cursor=pointer]:
+        - /url: /bridge/dashboard
+      - button "Switch to dark mode" [ref=e18]:
+        - generic [ref=e19]: ☀️
+        - generic [ref=e20]: "Current: light mode"
+  - main [ref=e21]:
+    - generic [ref=e22]:
+      - status "Loading resume" [ref=e24]:
+        - generic [ref=e26]: Loading resume data...
+      - generic [ref=e28]:
+        - button "Open AI Resume Coach" [ref=e30]: AI Resume Coach (15%)
+        - generic [ref=e31]:
+          - button "Print" [ref=e32]
+          - button "Download PDF" [ref=e33]
+        - generic [ref=e34]:
+          - radiogroup "Resume template" [ref=e35]:
+            - text: Template
+            - generic [ref=e36]:
+              - radio "ATS Classic Single column, black and white, serif font. Maximum ATS compatibility." [checked] [ref=e37]:
+                - generic [ref=e38]: ATS Classic
+                - generic [ref=e39]: Single column, black and white, serif font. Maximum ATS compatibility.
+              - radio "Modern Blue Two-column with navy sidebar. Clean and professional." [ref=e40]:
+                - generic [ref=e41]: Modern Blue
+                - generic [ref=e42]: Two-column with navy sidebar. Clean and professional.
+              - radio "Creative Bold gradient header with red accent. Eye-catching design." [ref=e43]:
+                - generic [ref=e44]: Creative
+                - generic [ref=e45]: Bold gradient header with red accent. Eye-catching design.
+              - radio "Minimal Light typography, clean whitespace. Understated elegance." [ref=e46]:
+                - generic [ref=e47]: Minimal
+                - generic [ref=e48]: Light typography, clean whitespace. Understated elegance.
+          - region "Resume preview" [ref=e49]:
+            - heading "Your Name" [level=1] [ref=e52]
+  - contentinfo [ref=e53]:
+    - generic [ref=e54]:
+      - generic [ref=e55]: ResumeAI
+      - generic [ref=e56]: BTech CSE Capstone Project
+    - generic [ref=e57]:
+      - generic [ref=e58]: Developed by
+      - generic [ref=e59]: Astha Chandel
+      - generic [ref=e60]: GF202214559
+    - generic [ref=e61]:
+      - img "Shoolini University" [ref=e62]
+      - generic [ref=e63]:
+        - generic [ref=e64]: Shoolini University
+        - generic [ref=e65]: Solan, Himachal Pradesh

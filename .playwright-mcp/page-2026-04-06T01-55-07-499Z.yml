@@ -1,0 +1,174 @@
+- generic [ref=e5]:
+  - navigation "Main navigation" [ref=e6]:
+    - link "Skip to content" [ref=e7] [cursor=pointer]:
+      - /url: "#main-content"
+    - link "ResumeAI home" [ref=e8] [cursor=pointer]:
+      - /url: /
+      - img "Shoolini University logo" [ref=e9]
+      - generic [ref=e10]:
+        - generic [ref=e11]: ResumeAI
+        - generic [ref=e12]: Shoolini University · BTech CSE Capstone
+    - generic [ref=e13]:
+      - link "Home" [ref=e14] [cursor=pointer]:
+        - /url: /
+      - link "Builder" [ref=e15] [cursor=pointer]:
+        - /url: /builder
+      - link "Employer" [ref=e16] [cursor=pointer]:
+        - /url: /employer
+      - link "Publish Criteria" [ref=e17] [cursor=pointer]:
+        - /url: /employer/publish
+      - link "Match Signals" [ref=e18] [cursor=pointer]:
+        - /url: /employer/matches
+      - link "My Applications" [ref=e19] [cursor=pointer]:
+        - /url: /bridge/dashboard
+      - button "Switch to dark mode" [ref=e20]:
+        - generic [ref=e21]: ☀️
+        - generic [ref=e22]: "Current: light mode"
+  - main [ref=e23]:
+    - main [ref=e24]:
+      - form "Publish hiring criteria" [ref=e25]:
+        - generic [ref=e26]:
+          - generic [ref=e27]: Job Title
+          - textbox "Job Title" [ref=e28]:
+            - /placeholder: e.g. Frontend Engineer
+            - text: Frontend Developer
+        - generic [ref=e29]:
+          - generic [ref=e30]: Job Description
+          - textbox "Job Description" [ref=e31]:
+            - /placeholder: Paste the full job description here...
+            - text: "We are looking for a Frontend Developer to join our team. Required Skills: - React.js with hooks and state management - TypeScript for type-safe development - CSS/Tailwind for responsive layouts - REST API integration Preferred Skills: - Next.js for SSR - Testing with Jest/Vitest - CI/CD experience"
+          - button "Extract skills from JD" [ref=e32]
+        - generic [ref=e33]:
+          - generic [ref=e34]: Required Skills
+          - list "Required Skills" [ref=e132]:
+            - listitem [ref=e133]:
+              - text: React.js with hooks and state management
+              - button "Remove React.js with hooks and state management" [ref=e134]: ×
+            - listitem [ref=e135]:
+              - text: TypeScript for type-safe development
+              - button "Remove TypeScript for type-safe development" [ref=e136]: ×
+            - listitem [ref=e137]:
+              - text: CSS/Tailwind for responsive layouts
+              - button "Remove CSS/Tailwind for responsive layouts" [ref=e138]: ×
+            - listitem [ref=e139]:
+              - text: REST API integration
+              - button "Remove REST API integration" [ref=e140]: ×
+          - generic [ref=e35]:
+            - textbox "Add required skills" [ref=e36]:
+              - /placeholder: Type a skill and press Enter
+            - button "Add" [disabled] [ref=e37]
+        - generic [ref=e38]:
+          - generic [ref=e39]: Preferred Skills
+          - list "Preferred Skills" [ref=e141]:
+            - listitem [ref=e142]:
+              - text: Next.js for SSR
+              - button "Remove Next.js for SSR" [ref=e143]: ×
+            - listitem [ref=e144]:
+              - text: Testing with Jest/Vitest
+              - button "Remove Testing with Jest/Vitest" [ref=e145]: ×
+            - listitem [ref=e146]:
+              - text: CI/CD experience
+              - button "Remove CI/CD experience" [ref=e147]: ×
+          - generic [ref=e40]:
+            - textbox "Add preferred skills" [ref=e41]:
+              - /placeholder: Type a skill and press Enter
+            - button "Add" [disabled] [ref=e42]
+        - group "Scoring Weights" [ref=e43]:
+          - generic [ref=e44]: Scoring Weights
+          - generic [ref=e45]:
+            - generic [ref=e46]:
+              - generic [ref=e47]: Skills Match
+              - slider "Skills Match" [ref=e48]: "30"
+              - generic [ref=e49]:
+                - text: 30%
+                - generic [ref=e50]: (30%)
+            - generic [ref=e51]:
+              - generic [ref=e52]: Experience
+              - slider "Experience" [ref=e53]: "20"
+              - generic [ref=e54]:
+                - text: 20%
+                - generic [ref=e55]: (20%)
+            - generic [ref=e56]:
+              - generic [ref=e57]: Education
+              - slider "Education" [ref=e58]: "15"
+              - generic [ref=e59]:
+                - text: 15%
+                - generic [ref=e60]: (15%)
+            - generic [ref=e61]:
+              - generic [ref=e62]: Projects
+              - slider "Projects" [ref=e63]: "10"
+              - generic [ref=e64]:
+                - text: 10%
+                - generic [ref=e65]: (10%)
+            - generic [ref=e66]:
+              - generic [ref=e67]: Certifications
+              - slider "Certifications" [ref=e68]: "5"
+              - generic [ref=e69]:
+                - text: 5%
+                - generic [ref=e70]: (5%)
+            - generic [ref=e71]:
+              - generic [ref=e72]: Distance
+              - slider "Distance" [ref=e73]: "5"
+              - generic [ref=e74]:
+                - text: 5%
+                - generic [ref=e75]: (5%)
+            - generic [ref=e76]:
+              - generic [ref=e77]: Extracurricular
+              - slider "Extracurricular" [ref=e78]: "5"
+              - generic [ref=e79]:
+                - text: 5%
+                - generic [ref=e80]: (5%)
+            - generic [ref=e81]:
+              - generic [ref=e82]: GPA
+              - slider "GPA" [ref=e83]: "3"
+              - generic [ref=e84]:
+                - text: 3%
+                - generic [ref=e85]: (3%)
+            - generic [ref=e86]:
+              - generic [ref=e87]: Completeness
+              - slider "Completeness" [ref=e88]: "2"
+              - generic [ref=e89]:
+                - text: 2%
+                - generic [ref=e90]: (2%)
+          - generic [ref=e91]:
+            - status [ref=e92]: "Total: 95% (must equal 100%)"
+            - button "Reset to research defaults" [active] [ref=e93]
+          - button "Show research citations" [ref=e95]
+        - group "Custom Signals" [ref=e96]:
+          - generic [ref=e97]: Custom Signals
+          - generic [ref=e98]:
+            - generic [ref=e99]:
+              - generic [ref=e100]: Name
+              - textbox "Name" [ref=e101]:
+                - /placeholder: e.g. Leadership
+            - generic [ref=e102]:
+              - generic [ref=e103]: Description
+              - textbox "Description" [ref=e104]:
+                - /placeholder: What to look for
+            - generic [ref=e105]:
+              - generic [ref=e106]: Weight
+              - spinbutton "Weight" [ref=e107]: "5"
+            - button "Add" [disabled] [ref=e108]
+        - generic [ref=e109]:
+          - generic [ref=e110]: "Pass Threshold: 70%"
+          - 'slider "Pass Threshold: 70%" [ref=e111]': "70"
+          - generic [ref=e112]:
+            - generic [ref=e113]: 30%
+            - generic [ref=e114]: 95%
+        - generic [ref=e115]:
+          - generic [ref=e116]: Questions per skill
+          - spinbutton "Questions per skill" [ref=e117]: "5"
+        - button "Publish Criteria" [ref=e118]
+  - contentinfo [ref=e119]:
+    - generic [ref=e120]:
+      - generic [ref=e121]: ResumeAI
+      - generic [ref=e122]: BTech CSE Capstone Project
+    - generic [ref=e123]:
+      - generic [ref=e124]: Developed by
+      - generic [ref=e125]: Astha Chandel
+      - generic [ref=e126]: GF202214559
+    - generic [ref=e127]:
+      - img "Shoolini University" [ref=e128]
+      - generic [ref=e129]:
+        - generic [ref=e130]: Shoolini University
+        - generic [ref=e131]: Solan, Himachal Pradesh

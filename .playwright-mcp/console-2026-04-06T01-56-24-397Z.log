@@ -1,0 +1,65 @@
+[     257ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=a3e5b4b8:20102
+[     379ms] [ERROR] In HTML, %s cannot be a descendant of <%s>.
+This will cause a hydration error.%s <form> form 
+
+  ...
+    <Routes>
+      <RenderedRoute match={{params:{}, ...}} routeContext={{...}}>
+        <Layout>
+          <div className="flex min-h..." style={{...}}>
+            <Navbar>
+            <main id="main-content" className="flex-1" tabIndex={-1}>
+              <Outlet>
+                <RenderedRoute match={{params:{}, ...}} routeContext={{outlet:null, ...}}>
+                  <Builder>
+                    <div className="flex min-h...">
+                      <div className="flex-1 ove..." style={{...}}>
+                        <ResumeForm>
+>                         <form
+>                           onSubmit={function onSubmit}
+>                           className="space-y-8 p-6"
+>                           aria-label="Resume form"
+>                           noValidate={true}
+>                         >
+                            <PersonalInfoForm>
+                            <SummaryForm>
+                            <DraggableSections>
+                            <button>
+                            <CustomSectionModal open={false} onClose={function onClose}>
+                              <dialog ref={{current:null}} onClose={function onClose} className="w-full max..." ...>
+>                               <form onSubmit={function handleSubmit} className="space-y-4 p-6">
+                      ...
+            ...
+ @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=a3e5b4b8:2155
+[     380ms] [ERROR] <%s> cannot contain a nested %s.
+See this log for the ancestor stack trace. form <form> @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=a3e5b4b8:2162
+[   28968ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=a3e5b4b8:20102
+[   30130ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=a3e5b4b8:20102
+[   43741ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=a3e5b4b8:20102
+[   44189ms] [ERROR] Access to image at 'https://shooliniuniversity.com/assets/images/logo.png' from origin 'http://localhost:5173' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ http://localhost:5173/pitch:0
+[   44190ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://shooliniuniversity.com/assets/images/logo.png:0
+[  166034ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=a3e5b4b8:20102
+[  166204ms] [ERROR] Access to image at 'https://shooliniuniversity.com/assets/images/logo.png' from origin 'http://localhost:5173' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ http://localhost:5173/pitch:0
+[  166204ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://shooliniuniversity.com/assets/images/logo.png:0
+[  166413ms] [ERROR] Access to image at 'https://shooliniuniversity.com/assets/images/logo.png' from origin 'http://localhost:5173' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ http://localhost:5173/pitch:0
+[  166413ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://shooliniuniversity.com/assets/images/logo.png:0
+[  191212ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=a3e5b4b8:20102
+[  191365ms] [ERROR] Access to image at 'https://shooliniuniversity.com/assets/images/logo.png' from origin 'http://localhost:5173' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ http://localhost:5173/pitch:0
+[  191365ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://shooliniuniversity.com/assets/images/logo.png:0
+[  191588ms] [ERROR] Access to image at 'https://shooliniuniversity.com/assets/images/logo.png' from origin 'http://localhost:5173' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ http://localhost:5173/pitch:0
+[  191588ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://shooliniuniversity.com/assets/images/logo.png:0
+[  220136ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=a3e5b4b8:20102
+[  220323ms] [ERROR] Access to image at 'https://shooliniuniversity.com/assets/images/logo.png' from origin 'http://localhost:5173' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ http://localhost:5173/pitch:0
+[  220323ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://shooliniuniversity.com/assets/images/logo.png:0
+[  220519ms] [ERROR] Access to image at 'https://shooliniuniversity.com/assets/images/logo.png' from origin 'http://localhost:5173' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ http://localhost:5173/pitch:0
+[  220519ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://shooliniuniversity.com/assets/images/logo.png:0
+[  233983ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=a3e5b4b8:20102
+[  234149ms] [ERROR] Access to image at 'https://shooliniuniversity.com/assets/images/logo.png' from origin 'http://localhost:5173' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ http://localhost:5173/pitch:0
+[  234150ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://shooliniuniversity.com/assets/images/logo.png:0
+[  234373ms] [ERROR] Access to image at 'https://shooliniuniversity.com/assets/images/logo.png' from origin 'http://localhost:5173' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ http://localhost:5173/pitch:0
+[  234373ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://shooliniuniversity.com/assets/images/logo.png:0
+[  242465ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=a3e5b4b8:20102
+[  242650ms] [ERROR] Access to image at 'https://shooliniuniversity.com/assets/images/logo.png' from origin 'http://localhost:5173' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ http://localhost:5173/pitch:0
+[  242650ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://shooliniuniversity.com/assets/images/logo.png:0
+[  242851ms] [ERROR] Access to image at 'https://shooliniuniversity.com/assets/images/logo.png' from origin 'http://localhost:5173' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ http://localhost:5173/pitch:0
+[  242851ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://shooliniuniversity.com/assets/images/logo.png:0
