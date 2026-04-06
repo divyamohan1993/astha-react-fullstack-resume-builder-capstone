@@ -1,0 +1,35 @@
+[     422ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=5d687b3f:20102
+[     675ms] [ERROR] In HTML, %s cannot be a descendant of <%s>.
+This will cause a hydration error.%s <form> form 
+
+  ...
+    <Routes>
+      <RenderedRoute match={{params:{}, ...}} routeContext={{...}}>
+        <Layout>
+          <div className="flex min-h..." style={{...}}>
+            <Navbar>
+            <main id="main-content" className="flex-1" tabIndex={-1}>
+              <Outlet>
+                <RenderedRoute match={{params:{}, ...}} routeContext={{outlet:null, ...}}>
+                  <Builder>
+                    <div className="flex min-h...">
+                      <div className="flex-1 ove..." style={{...}}>
+                        <ResumeForm>
+>                         <form
+>                           onSubmit={function onSubmit}
+>                           className="space-y-8 p-6"
+>                           aria-label="Resume form"
+>                           noValidate={true}
+>                         >
+                            <PersonalInfoForm>
+                            <SummaryForm>
+                            <DraggableSections>
+                            <button>
+                            <CustomSectionModal open={false} onClose={function onClose}>
+                              <dialog ref={{current:null}} onClose={function onClose} className="w-full max..." ...>
+>                               <form onSubmit={function handleSubmit} className="space-y-4 p-6">
+                      ...
+            ...
+ @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=5d687b3f:2155
+[     675ms] [ERROR] <%s> cannot contain a nested %s.
+See this log for the ancestor stack trace. form <form> @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=5d687b3f:2162
