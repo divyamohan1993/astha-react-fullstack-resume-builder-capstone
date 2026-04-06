@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { collection, query, where, onSnapshot, doc, getDoc, getDocs } from 'firebase/firestore';
-import { getDb } from '../../firebase/config';
+import { getDb, isFirebaseConfigured } from '../../firebase/config';
 import { getCurrentUser } from '../../firebase/auth';
 import type { MatchSignal, BridgeCriteria } from '../types';
 
@@ -23,6 +23,12 @@ export default function CandidateDashboard() {
   const [replies, setReplies] = useState<Record<string, EmployerReplyData>>({});
 
   useEffect(() => {
+    if (!isFirebaseConfigured()) {
+      setError('Firebase not configured. Set VITE_FIREBASE_* env vars.');
+      setLoading(false);
+      return;
+    }
+
     const user = getCurrentUser();
     if (!user) {
       setError('Sign in to view your applications.');

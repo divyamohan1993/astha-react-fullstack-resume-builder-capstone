@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { collection, query, where, orderBy, onSnapshot } from 'firebase/firestore';
 import { getFunctions, httpsCallable } from 'firebase/functions';
-import { getDb, initFirebase } from '../../firebase/config';
+import { getDb, initFirebase, isFirebaseConfigured } from '../../firebase/config';
 import { getCurrentUser } from '../../firebase/auth';
 import type { MatchSignal } from '../types';
 
@@ -29,6 +29,12 @@ export default function EmployerMatchDashboard() {
   const [repliedIds, setRepliedIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
+    if (!isFirebaseConfigured()) {
+      setError('Firebase not configured. Set VITE_FIREBASE_* env vars.');
+      setLoading(false);
+      return;
+    }
+
     const user = getCurrentUser();
     if (!user) {
       setError('Sign in to view match signals.');

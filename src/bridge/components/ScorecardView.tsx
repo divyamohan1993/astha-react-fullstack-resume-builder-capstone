@@ -9,7 +9,7 @@
 import { useEffect, useState, useCallback, useRef, type FormEvent } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { getFunctions, httpsCallable } from 'firebase/functions';
-import { initFirebase } from '../../firebase/config';
+import { initFirebase, isFirebaseConfigured } from '../../firebase/config';
 import { getCurrentUser } from '../../firebase/auth';
 import { useBridgeStore } from '../store';
 import type {
@@ -118,6 +118,11 @@ export function ScorecardView({ criteriaCode }: Props) {
       setSignError(null);
 
       try {
+        if (!isFirebaseConfigured()) {
+          setSignError('Firebase not configured. Scorecard cannot be signed.');
+          setSigning(false);
+          return;
+        }
         const criteriaHash = await hashString(JSON.stringify(criteria));
         const user = getCurrentUser();
         const payload = {

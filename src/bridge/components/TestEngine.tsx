@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { doc, getDoc } from 'firebase/firestore';
-import { getDb } from '../../firebase/config';
+import { getDb, isFirebaseConfigured } from '../../firebase/config';
 import { signInAnon, getCurrentUser } from '../../firebase/auth';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { initFirebase } from '../../firebase/config';
@@ -104,6 +104,14 @@ export function TestEngine({ criteriaCode }: Props) {
 
     async function load() {
       try {
+        if (!isFirebaseConfigured()) {
+          if (!cancelled) {
+            setError('Firebase not configured. Set VITE_FIREBASE_* env vars.');
+            setPhase('error');
+          }
+          return;
+        }
+
         // Ensure anonymous auth
         if (!getCurrentUser()) {
           await signInAnon();
