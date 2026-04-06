@@ -1,0 +1,61 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Criteria: anyone reads active, authenticated employers write
+    match /criteria/{code} {
+      allow read: if resource.data.active == true;
+      allow create, update: if request.auth != null
+        && request.auth.token.role == 'employer';
+      allow delete: if request.auth != null
+        && request.auth.token.role == 'employer'
+        && resource.data.employerId == request.auth.uid;
+    }
+
+    // Sessions: only the owning candidate
+    match /sessions/{sessionId} {
+      allow read, update: if request.auth != null
+        && resource.data.candidateId == request.auth.uid;
+      allow create: if false; // Cloud Functions only
+      allow delete: if false;
+    }
+
+    // Scorecards: candidates own, employers for their criteria, only Cloud Functions create
+    match /scorecards/{scorecardId} {
+      allow read: if request.auth != null
+        && (resource.data.candidateId == request.auth.uid
+            || resource.data.employerId == request.auth.uid);
+      allow create, update, delete: if false; // Cloud Functions only
+    }
+
+    // Matches: candidates create, both sides read
+    match /matches/{matchId} {
+      allow read: if request.auth != null
+        && (resource.data.candidateId == request.auth.uid
+            || resource.data.employerId == request.auth.uid);
+      allow create: if false; // Cloud Functions only
+      allow update, delete: if false;
+    }
+
+    // Replies: employers create, both sides read
+    match /replies/{replyId} {
+      allow read: if request.auth != null
+        && (resource.data.candidateId == request.auth.uid
+            || resource.data.employerId == request.auth.uid);
+      allow create, update, delete: if false; // Cloud Functions only
+    }
+
+    // Notifications: only the recipient reads, Cloud Functions write
+    match /notifications/{notifId} {
+      allow read: if request.auth != null
+        && resource.data.recipientId == request.auth.uid;
+      allow create, update, delete: if false;
+    }
+
+    // Mail collection for SendGrid trigger
+    match /mail/{mailId} {
+      allow read, write: if false; // Cloud Functions only
+    }
+  }
+}
