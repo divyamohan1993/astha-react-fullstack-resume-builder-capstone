@@ -100,7 +100,6 @@ export function ScorecardView({ criteriaCode }: Props) {
 
   // Derived values
   const verification = scorecard?.verification ?? state?.verification;
-  const integrity = scorecard?.integrity ?? state?.integrity;
   const resumeScore = selfAssessment?.overall ?? scorecard?.resumeScore?.overall ?? 0;
   const verifiedScore = verification?.overall ?? 0;
   const gap = resumeScore - verifiedScore;
@@ -128,7 +127,7 @@ export function ScorecardView({ criteriaCode }: Props) {
           candidateId: user?.uid ?? testSession!.candidateId,
           sessionId: testSession!.sessionId,
           timestamp: new Date().toISOString(),
-          resumeScore: selfAssessment,
+          resumeScore: selfAssessment!,
           resumePin: testSession!.resumePin,
           verification: state!.verification,
           integrity: state!.integrity,

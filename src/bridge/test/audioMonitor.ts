@@ -50,8 +50,6 @@ export function createAudioMonitor(config: AudioMonitorConfig): {
   let speechBurstStartTs = 0;
   let speechBurstActive = false;
   let speechBursts: { startTs: number; endTs: number }[] = [];
-  let lastNonSpeechTs = 0;
-  let continuousSpeechStartTs = 0;
   let continuousSpeechFlagged = false;
 
   // Energy envelope for temporal analysis
@@ -220,10 +218,8 @@ export function createAudioMonitor(config: AudioMonitorConfig): {
           }
         }
 
-        continuousSpeechStartTs = 0;
         continuousSpeechFlagged = false;
       }
-      lastNonSpeechTs = now;
     }
   }
 

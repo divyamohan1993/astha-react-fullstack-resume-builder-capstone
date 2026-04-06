@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { collection, query, where, orderBy, onSnapshot, doc, getDoc } from 'firebase/firestore';
+import { collection, query, where, orderBy, onSnapshot } from 'firebase/firestore';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { getDb, initFirebase } from '../../firebase/config';
 import { getCurrentUser } from '../../firebase/auth';
-import type { MatchSignal, BridgeCriteria } from '../types';
+import type { MatchSignal } from '../types';
 
 type SortKey = 'candidateName' | 'resumeScore' | 'verifiedScore' | 'integrityScore' | 'gap' | 'status' | 'sentAt';
 type SortDir = 'asc' | 'desc';

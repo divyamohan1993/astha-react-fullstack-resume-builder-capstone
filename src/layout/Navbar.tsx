@@ -5,6 +5,9 @@ const NAV_LINKS = [
   { to: '/', label: 'Home' },
   { to: '/builder', label: 'Builder' },
   { to: '/employer', label: 'Employer' },
+  { to: '/employer/publish', label: 'Publish Criteria' },
+  { to: '/employer/matches', label: 'Match Signals' },
+  { to: '/bridge/dashboard', label: 'My Applications' },
 ] as const;
 
 export function Navbar() {
