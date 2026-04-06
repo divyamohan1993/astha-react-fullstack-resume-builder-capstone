@@ -263,7 +263,7 @@ export function TestEngine({ criteriaCode }: Props) {
         try {
           const { app: fbApp } = initFirebase();
           const fns = getFunctions(fbApp);
-          const heartbeat = httpsCallable(fns, 'testHeartbeat');
+          const heartbeat = httpsCallable(fns, 'heartbeat');
           heartbeat({
             criteriaCode,
             questionIndex: currentIndexRef.current,

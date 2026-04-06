@@ -21,31 +21,43 @@ export const publishCriteria = onCall(async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError('unauthenticated', 'Sign in required.');
 
-  const { title, criteria, weights } = request.data as {
-    title: string;
-    criteria: Record<string, number>;
+  const data = request.data as {
+    jobTitle: string;
+    description: string;
+    requiredSkills: string[];
+    preferredSkills: string[];
+    customSignals: { name: string; weight: number; description: string }[];
     weights: Record<string, number>;
+    threshold: number;
+    testConfig: { skillsToTest: string[]; difficultyFloor: number; questionCount: number };
   };
 
-  if (!title || !criteria || !weights) {
-    throw new HttpsError('invalid-argument', 'title, criteria, and weights required.');
+  if (!data.jobTitle || !data.requiredSkills?.length || !data.weights) {
+    throw new HttpsError('invalid-argument', 'jobTitle, requiredSkills, and weights required.');
   }
 
-  const code = shortCode();
+  const sc = shortCode();
   const signingSecret = randomBytes(32).toString('hex');
 
-  await db.collection('criteria').doc(code).set({
-    code,
-    title,
-    criteria,
-    weights,
+  await db.collection('criteria').doc(sc).set({
+    shortCode: sc,
+    jobTitle: data.jobTitle,
+    description: data.description || '',
+    requiredSkills: data.requiredSkills,
+    preferredSkills: data.preferredSkills || [],
+    customSignals: data.customSignals || [],
+    weights: data.weights,
+    threshold: data.threshold ?? 70,
+    testConfig: data.testConfig ?? { skillsToTest: data.requiredSkills.slice(0, 5), difficultyFloor: 1, questionCount: 5 },
     signingSecret,
     employerId: uid,
-    active: true,
+    employerEmail: request.auth?.token?.email || '',
+    status: 'active',
     createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    expiresAt: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
   });
 
-  return { code };
+  return { shortCode: sc };
 });
 
 /**
@@ -133,18 +145,26 @@ export const signScorecard = onCall(async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError('unauthenticated', 'Sign in required.');
 
-  const { sessionId, scores, summary } = request.data as {
+  const data = request.data as {
+    version: number;
+    criteriaCode: string;
+    criteriaHash: string;
     sessionId: string;
-    scores: Record<string, number>;
-    summary: string;
+    timestamp: string;
+    resumeScore: Record<string, unknown>;
+    resumePin: Record<string, unknown>;
+    verification: Record<string, unknown>;
+    integrity: Record<string, unknown>;
+    gap: number;
+    calibration: Record<string, unknown>;
   };
 
-  if (!sessionId || !scores) {
-    throw new HttpsError('invalid-argument', 'sessionId and scores required.');
+  if (!data.sessionId || !data.criteriaCode) {
+    throw new HttpsError('invalid-argument', 'sessionId and criteriaCode required.');
   }
 
   // Validate session
-  const sessionRef = db.collection('sessions').doc(sessionId);
+  const sessionRef = db.collection('sessions').doc(data.sessionId);
   const session = await sessionRef.get();
 
   if (!session.exists) throw new HttpsError('not-found', 'Session not found.');
@@ -152,34 +172,41 @@ export const signScorecard = onCall(async (request) => {
   if (sessionData.candidateId !== uid) {
     throw new HttpsError('permission-denied', 'Not your session.');
   }
-  if (sessionData.status !== 'active') {
-    throw new HttpsError('failed-precondition', 'Session not active.');
+  if (sessionData.status === 'completed') {
+    throw new HttpsError('failed-precondition', 'Session already scored.');
   }
 
-  // Get criteria for signing secret and employer ID
-  const criteriaDoc = await db.collection('criteria').doc(sessionData.criteriaCode).get();
+  // Get criteria for signing secret
+  const criteriaDoc = await db.collection('criteria').doc(data.criteriaCode).get();
   if (!criteriaDoc.exists) throw new HttpsError('not-found', 'Criteria not found.');
   const criteriaData = criteriaDoc.data()!;
 
-  // Build payload and sign with HMAC-SHA256
-  const payload = {
-    sessionId,
+  // Build canonical payload for signing (exclude signature field)
+  const canonical = JSON.stringify({
+    version: data.version,
+    criteriaCode: data.criteriaCode,
+    criteriaHash: data.criteriaHash,
     candidateId: uid,
-    criteriaCode: sessionData.criteriaCode,
-    scores,
-    summary: summary || '',
-    timestamp: Date.now(),
-  };
+    sessionId: data.sessionId,
+    timestamp: data.timestamp,
+    resumeScore: data.resumeScore,
+    resumePin: data.resumePin,
+    verification: data.verification,
+    integrity: data.integrity,
+    gap: data.gap,
+    calibration: data.calibration,
+  });
 
   const signature = createHmac('sha256', criteriaData.signingSecret)
-    .update(JSON.stringify(payload))
+    .update(canonical)
     .digest('hex');
 
   const scorecardRef = db.collection('scorecards').doc();
   await scorecardRef.set({
-    ...payload,
-    signature,
+    ...JSON.parse(canonical),
+    candidateId: uid,
     employerId: criteriaData.employerId,
+    signature,
     createdAt: admin.firestore.FieldValue.serverTimestamp(),
   });
 
@@ -196,29 +223,40 @@ export const sendMatchSignal = onCall(async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError('unauthenticated', 'Sign in required.');
 
-  const { scorecardId, message } = request.data as {
-    scorecardId: string;
-    message?: string;
+  const data = request.data as {
+    criteriaCode: string;
+    scorecardSignature: string;
+    contactInfo: { name: string; email: string; phone?: string; linkedin?: string; github?: string };
+    resumeScore: number;
+    verifiedScore: number;
+    integrityScore: number;
+    gap: number;
   };
 
-  if (!scorecardId) throw new HttpsError('invalid-argument', 'scorecardId required.');
-
-  // Validate scorecard ownership
-  const scorecardDoc = await db.collection('scorecards').doc(scorecardId).get();
-  if (!scorecardDoc.exists) throw new HttpsError('not-found', 'Scorecard not found.');
-  if (scorecardDoc.data()?.candidateId !== uid) {
-    throw new HttpsError('permission-denied', 'Not your scorecard.');
+  if (!data.criteriaCode || !data.contactInfo?.name || !data.contactInfo?.email) {
+    throw new HttpsError('invalid-argument', 'criteriaCode and contactInfo (name, email) required.');
   }
+
+  // Validate criteria exists
+  const criteriaDoc = await db.collection('criteria').doc(data.criteriaCode).get();
+  if (!criteriaDoc.exists) throw new HttpsError('not-found', 'Criteria not found.');
+  const criteriaData = criteriaDoc.data()!;
 
   const matchRef = db.collection('matches').doc();
   await matchRef.set({
-    scorecardId,
+    matchId: matchRef.id,
+    criteriaCode: data.criteriaCode,
+    scorecardSignature: data.scorecardSignature,
     candidateId: uid,
-    employerId: scorecardDoc.data()!.employerId,
-    criteriaCode: scorecardDoc.data()!.criteriaCode,
-    message: message || '',
+    employerId: criteriaData.employerId,
+    contactInfo: data.contactInfo,
+    resumeScore: data.resumeScore ?? 0,
+    verifiedScore: data.verifiedScore ?? 0,
+    integrityScore: data.integrityScore ?? 0,
+    gap: data.gap ?? 0,
+    meetsThreshold: (data.verifiedScore ?? 0) >= (criteriaData.threshold ?? 70),
     status: 'pending',
-    createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    sentAt: admin.firestore.FieldValue.serverTimestamp(),
   });
 
   return { matchId: matchRef.id };
@@ -231,14 +269,13 @@ export const replyToMatch = onCall(async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError('unauthenticated', 'Sign in required.');
 
-  const { matchId, accepted, message } = request.data as {
+  const { matchId, message } = request.data as {
     matchId: string;
-    accepted: boolean;
     message?: string;
   };
 
-  if (!matchId || typeof accepted !== 'boolean') {
-    throw new HttpsError('invalid-argument', 'matchId and accepted required.');
+  if (!matchId) {
+    throw new HttpsError('invalid-argument', 'matchId required.');
   }
 
   // Validate employer ownership
@@ -264,14 +301,13 @@ export const replyToMatch = onCall(async (request) => {
     matchId,
     employerId: uid,
     candidateId: matchDoc.data()!.candidateId,
-    accepted,
     message: message || '',
     createdAt: admin.firestore.FieldValue.serverTimestamp(),
   });
 
   // Update match status
   await db.collection('matches').doc(matchId).update({
-    status: accepted ? 'accepted' : 'declined',
+    status: 'replied',
   });
 
   return { replyId: replyRef.id };

@@ -1,0 +1,83 @@
+- generic [ref=e3]:
+  - navigation "Main navigation" [ref=e4]:
+    - link "Skip to content" [ref=e5] [cursor=pointer]:
+      - /url: "#main-content"
+    - link "ResumeAI home" [ref=e6] [cursor=pointer]:
+      - /url: /
+      - img "Shoolini University logo" [ref=e7]
+      - generic [ref=e8]:
+        - generic [ref=e9]: ResumeAI
+        - generic [ref=e10]: Shoolini University · BTech CSE Capstone
+    - generic [ref=e11]:
+      - link "Home" [ref=e12] [cursor=pointer]:
+        - /url: /
+      - link "Builder" [ref=e13] [cursor=pointer]:
+        - /url: /builder
+      - link "Employer" [ref=e14] [cursor=pointer]:
+        - /url: /employer
+      - link "Publish Criteria" [ref=e15] [cursor=pointer]:
+        - /url: /employer/publish
+      - link "Match Signals" [ref=e16] [cursor=pointer]:
+        - /url: /employer/matches
+      - link "My Applications" [ref=e17] [cursor=pointer]:
+        - /url: /bridge/dashboard
+      - button "Switch to dark mode" [ref=e18]:
+        - generic [ref=e19]: ☀️
+        - generic [ref=e20]: "Current: light mode"
+  - main [ref=e21]:
+    - generic [ref=e22]:
+      - generic [ref=e23]:
+        - heading "Your Resume. Your Career. AI-Powered." [level=1] [ref=e24]:
+          - text: Your Resume. Your Career.
+          - text: AI-Powered.
+        - paragraph [ref=e25]: Build ATS-ready resumes. Analyze candidates against job descriptions. Runs entirely in your browser. No data leaves your device.
+        - generic [ref=e26]:
+          - generic [ref=e27]: 100% Offline
+          - generic [ref=e28]: In-Browser AI
+          - generic [ref=e29]: WCAG 2.2 AAA
+          - generic [ref=e30]: Research-Backed Scoring
+          - generic [ref=e31]: Zero Server Cost
+      - generic [ref=e32]:
+        - link "I'm a Student Build your resume. 4 templates. Live preview. Print or download PDF. Start Building" [ref=e33] [cursor=pointer]:
+          - /url: /builder
+          - generic [ref=e34]: 📝
+          - heading "I'm a Student" [level=2] [ref=e35]
+          - paragraph [ref=e36]: Build your resume. 4 templates. Live preview. Print or download PDF.
+          - generic [ref=e37]: Start Building
+        - link "I'm a Recruiter Paste JD. Upload 100s of resumes. AI scores with cited research. Analyze Candidates" [ref=e38] [cursor=pointer]:
+          - /url: /employer
+          - generic [ref=e39]: 📊
+          - heading "I'm a Recruiter" [level=2] [ref=e40]
+          - paragraph [ref=e41]: Paste JD. Upload 100s of resumes. AI scores with cited research.
+          - generic [ref=e42]: Analyze Candidates
+      - generic [ref=e43]:
+        - 'heading "Bridge: The Trust Layer" [level=2] [ref=e44]'
+        - paragraph [ref=e45]: Bridge connects what you claim with what you can prove. Employers publish criteria, candidates self-assess and verify skills through timed challenges, and both sides get a transparent scorecard.
+        - generic [ref=e46]:
+          - generic [ref=e47]:
+            - generic [ref=e48]: 📋
+            - heading "Self-Assessment" [level=3] [ref=e49]
+            - paragraph [ref=e50]: Rate yourself against employer criteria. Honest signals that go beyond keywords.
+          - generic [ref=e51]:
+            - generic [ref=e52]: 🧪
+            - heading "Skill Verification" [level=3] [ref=e53]
+            - paragraph [ref=e54]: Timed coding and scenario challenges generated to match the job. No shortcuts.
+          - generic [ref=e55]:
+            - generic [ref=e56]: ✅
+            - heading "Verified Scorecard" [level=3] [ref=e57]
+            - paragraph [ref=e58]: A tamper-evident scorecard with integrity hashes. Share it, print it, trust it.
+        - link "Build your resume and get verified" [ref=e60] [cursor=pointer]:
+          - /url: /builder
+  - contentinfo [ref=e61]:
+    - generic [ref=e62]:
+      - generic [ref=e63]: ResumeAI
+      - generic [ref=e64]: BTech CSE Capstone Project
+    - generic [ref=e65]:
+      - generic [ref=e66]: Developed by
+      - generic [ref=e67]: Astha Chandel
+      - generic [ref=e68]: GF202214559
+    - generic [ref=e69]:
+      - img "Shoolini University" [ref=e70]
+      - generic [ref=e71]:
+        - generic [ref=e72]: Shoolini University
+        - generic [ref=e73]: Solan, Himachal Pradesh
